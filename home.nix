@@ -27,6 +27,8 @@
     pkgs.ripgrep
     pkgs.fd
     pkgs.gimp
+    # langs
+    pkgs.nodePackages_latest.pyright
     # ham radio
     pkgs.tqsl
     pkgs.klog
@@ -34,20 +36,80 @@
     pkgs.taskell
   ] ++ homePkgs; # fromFlakes
 
-  # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
-
   programs.neovim = {
     enable = true;
     plugins = with pkgs.vimPlugins; [
-      vim-airline
-      vim-airline-themes
+      {
+        plugin = vim-airline;
+        config = ''
+          " Airline
+          let g:airline#extensions#tabline#enabled = 1
+          let g:airline_powerline_fonts = 1
+        '';
+      }
+      {
+        plugin = vim-airline-themes;
+        config = "let g:airline_theme='minimalist'";
+      }
+      nord-nvim
       vim-nix
-      #(nvim-treesitter.withPlugins (p: pkgs.tree-sitter.allGrammars))
-      nvim-treesitter
+      nvim-metals
+      (nvim-treesitter.withPlugins (p: pkgs.tree-sitter.allGrammars))
+      # nvim-treesitter
+      {
+        plugin = nvim-lspconfig;
+        config = ''
+          lua << EOF
+          local on_attach = function(client, bufnr)
+            -- Enable completion triggered by <c-x><c-o>
+            vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+            -- Mappings.
+            -- See `:help vim.lsp.*` for documentation on any of the below functions
+            local bufopts = { noremap=true, silent=true, buffer=bufnr }
+            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+            vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+            vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+            vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+            vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+            vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+            vim.keymap.set('n', '<space>wl', function()
+              print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+            end, bufopts)
+            vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
+            vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
+            vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+            vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+            vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
+          end
+          local lsp_flags = {
+            debounce_text_changes = 150,
+          }
+          require('lspconfig')['pyright'].setup{
+            on_attach = on_attach,
+            flags = lsp_flags,
+          }
+          require('lspconfig')['metals'].setup{
+            on_attach = on_attach,
+            flags = lsp_flags,
+          }
+          EOF
+        '';
+      }
       popup-nvim
       plenary-nvim
-      telescope-nvim
+      {
+        plugin = telescope-nvim;
+        config = ''
+          " telescope
+          let mapleader=";"
+          nnoremap <leader>ff <cmd>Telescope find_files<cr>
+          nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+          nnoremap <leader>fb <cmd>Telescope buffers<cr>
+          nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+        '';
+      }
       gitsigns-nvim
       markdown-preview-nvim
     ];
@@ -59,6 +121,7 @@
 
       autocmd!
       syntax enable
+      colorscheme nord
 
       set encoding=utf-8 
       set title
@@ -73,17 +136,6 @@
       set tabstop=2
       set ai
       set si
-
-      " Airline
-      let g:airline#extensions#tabline#enabled = 1
-      let g:airline_powerline_fonts = 1
-
-      " telescope
-      let mapleader=";"
-      nnoremap <leader>ff <cmd>Telescope find_files<cr>
-      nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-      nnoremap <leader>fb <cmd>Telescope buffers<cr>
-      nnoremap <leader>fh <cmd>Telescope help_tags<cr>
     '';
   };
 
@@ -94,11 +146,7 @@
   programs.password-store = {
     enable = true;
     settings = { PASSWORD_STORE_DIR = "/home/cesar/.password-store"; };
-  };
-
-  programs.neomutt = {
-    enable = true;
-    vimKeys = true;
+    package = pkgs.pass.withExtensions (ext: [ ext.pass-otp ext.pass-import ]);
   };
 
   programs.helix = {
@@ -150,4 +198,5 @@
       }
     ];
   };
+  
 }
