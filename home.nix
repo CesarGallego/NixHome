@@ -22,6 +22,7 @@
     pkgs.fzf
     pkgs.feh
     pkgs.calcurse
+    (pkgs.aspellWithDicts (dicts: with dicts; [ en es ]))
     # dev
     pkgs.xclip
     pkgs.ripgrep
@@ -94,7 +95,12 @@
             on_attach = on_attach,
             flags = lsp_flags,
           }
+          require('lspconfig')['gopls'].setup{
+            on_attach = on_attach,
+            flags = lsp_flags,
+          }
           EOF
+          set completeopt-=preview
         '';
       }
       popup-nvim
@@ -110,8 +116,21 @@
           nnoremap <leader>fh <cmd>Telescope help_tags<cr>
         '';
       }
+      {
+        plugin = trouble-nvim;
+        config = ''
+          " trouble
+          nnoremap <leader>xx <cmd>TroubleToggle<cr>
+          nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
+          nnoremap <leader>xd <cmd>TroubleToggle document_diagnostics<cr>
+          nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
+          nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
+          nnoremap gR <cmd>TroubleToggle lsp_references<cr>
+        '';
+      }
       gitsigns-nvim
       markdown-preview-nvim
+      nvim-web-devicons
     ];
     extraConfig = ''
       set clipboard=unnamedplus
@@ -136,6 +155,8 @@
       set tabstop=2
       set ai
       set si
+
+      set spelllang=es,en
     '';
   };
 
