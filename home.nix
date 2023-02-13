@@ -23,6 +23,7 @@
     pkgs.feh
     pkgs.calcurse
     (pkgs.aspellWithDicts (dicts: with dicts; [ en es ]))
+    pkgs.neomutt
     # dev
     pkgs.xclip
     pkgs.ripgrep
@@ -36,6 +37,11 @@
     #util
     pkgs.taskell
   ] ++ homePkgs; # fromFlakes
+
+  # ¿Es ético operar nustro propio cerebro?
+  programs.home-manager = {
+    enable = true;
+  };
 
   programs.neovim = {
     enable = true;
@@ -156,7 +162,7 @@
       set ai
       set si
 
-      set spelllang=es,en
+      set spelllang=es
     '';
   };
 
