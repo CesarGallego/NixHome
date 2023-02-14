@@ -34,8 +34,6 @@
     # ham radio
     pkgs.tqsl
     pkgs.klog
-    #util
-    pkgs.taskell
   ] ++ homePkgs; # fromFlakes
 
   # ¿Es ético operar nustro propio cerebro?
