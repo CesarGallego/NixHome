@@ -135,6 +135,7 @@
       gitsigns-nvim
       markdown-preview-nvim
       nvim-web-devicons
+      copilot-vim
     ];
     extraConfig = ''
       set clipboard=unnamedplus
