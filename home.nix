@@ -135,6 +135,13 @@
       gitsigns-nvim
       markdown-preview-nvim
       nvim-web-devicons
+      {
+        plugin = lazygit-nvim;
+        config = ''
+          " setup mapping to call :LazyGit
+          nnoremap <silent> <leader>gg :LazyGit<CR>
+        '';
+      }
       copilot-vim
     ];
     extraConfig = ''
