@@ -19,7 +19,6 @@
   home.packages = [
     # sys
     pkgs.htop
-    pkgs.fzf
     pkgs.feh
     pkgs.calcurse
     (pkgs.aspellWithDicts (dicts: with dicts; [ en es ]))
@@ -38,6 +37,10 @@
 
   # ¿Es ético operar nustro propio cerebro?
   programs.home-manager = {
+    enable = true;
+  };
+
+  programs.fzf = {
     enable = true;
   };
 
@@ -143,6 +146,12 @@
         '';
       }
       copilot-vim
+      {
+        plugin = vim-easymotion;
+        config = ''
+          nnoremap \ <Plug>(easymotion-overwin-f)
+        '';
+      }
     ];
     extraConfig = ''
       set clipboard=unnamedplus
@@ -169,6 +178,22 @@
       set si
 
       set spelllang=es
+
+      lua << EOF
+        if vim.g.neovide then
+          vim.opt.guifont = { "Fira Code Nerd Font", "h11" }
+          vim.g.neovide_scale_factor = 1.0
+          local change_scale_factor = function(delta)
+            vim.g.neovide_scale_factor = vim.g.neovide_scale_factor * delta
+          end
+          vim.keymap.set("n", "<C-=>", function()
+            change_scale_factor(1.25)
+          end)
+          vim.keymap.set("n", "<C-->", function()
+            change_scale_factor(1/1.25)
+          end)
+        end
+      EOF
     '';
   };
 
