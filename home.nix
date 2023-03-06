@@ -1,4 +1,4 @@
-{ config, pkgs, homePkgs ? [ ], ... }:
+{ config, pkgs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the
@@ -14,7 +14,7 @@
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "22.05";
+  home.stateVersion = "22.11";
 
   home.packages = [
     # sys
@@ -33,7 +33,7 @@
     # ham radio
     pkgs.tqsl
     pkgs.klog
-  ] ++ homePkgs; # fromFlakes
+  ];
 
   # ¿Es ético operar nustro propio cerebro?
   programs.home-manager = {
