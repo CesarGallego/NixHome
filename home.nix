@@ -48,6 +48,67 @@
     enable = true;
     plugins = with pkgs.vimPlugins; [
       {
+        plugin = vim-which-key;
+        config = ''
+        '';
+      }
+      {
+        plugin = nvim-whichkey-setup-lua;
+        config = ''
+          let mapleader=" "
+          lua << EOF
+            local wk = require('whichkey_setup')
+
+            local keymap = {
+                f = { -- set a nested structure
+                    name = '+find',
+                    f = {'<Cmd>Telescope find_files<CR>', 'files'},
+                    b = {'<Cmd>Telescope buffers<CR>', 'buffers'},
+                    h = {'<Cmd>Telescope help_tags<CR>', 'help tags'},
+                    c = {
+                        name = '+commands',
+                        c = {'<Cmd>Telescope commands<CR>', 'commands'},
+                        h = {'<Cmd>Telescope command_history<CR>', 'history'},
+                    },
+                    q = {'<Cmd>Telescope quickfix<CR>', 'quickfix'},
+                    g = {
+                        name = '+git',
+                        g = {'<Cmd>Telescope git_commits<CR>', 'commits'},
+                        c = {'<Cmd>Telescope git_bcommits<CR>', 'bcommits'},
+                        b = {'<Cmd>Telescope git_branches<CR>', 'branches'},
+                        s = {'<Cmd>Telescope git_status<CR>', 'status'},
+                    },
+                },
+                c = { -- LSP Mappings.
+                -- See `:help vim.lsp.*` for documentation on any of the below functions
+                  g = {
+                    name = '+go to',
+                    D = {'<Cmd>lua vim.lsp.buf.declaration()<CR>', 'declaration'},
+                    d = {'<Cmd>lua vim.lsp.buf.definition()<CR>', 'definition'},
+                    i = {'<Cmd>lua vim.lsp.buf.implementation()<CR>', 'implementation'},
+                    r = {'<Cmd>lua vim.lsp.buf.references()<CR>', 'references'},
+                  },
+                  K = {'<Cmd>lua vim.lsp.buf.hover()<CR>', 'Hover'},
+                  H = {'<Cmd>lua vim.lsp.buf.signature_help()<CR>', 'signature help'},
+                  a = {'<Cmd>lua vim.lsp.buf.code_action()<CR>', 'code action'},
+                  w = {
+                    name = '+workspace',
+                    a = {'<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', 'add folder'},
+                    r = {'<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', 'remove folder'},
+                    l = {'<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', 'list folders'},
+                  },
+                  d = {'<Cmd>lua vim.lsp.buf.type_definition()<CR>', 'type definition'},
+                  r = {'<Cmd>lua vim.lsp.buf.rename()<CR>', 'rename'},
+                  e = {'<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', 'show line diagnostics'},
+                  f = {'<Cmd>lua vim.lsp.buf.formatting()<CR>', 'format'},
+                }
+            }
+
+            wk.register_keymap('leader', keymap)
+          EOF
+        '';
+      }
+      {
         plugin = vim-airline;
         config = ''
           " Airline
@@ -72,24 +133,6 @@
             -- Enable completion triggered by <c-x><c-o>
             vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-            -- Mappings.
-            -- See `:help vim.lsp.*` for documentation on any of the below functions
-            local bufopts = { noremap=true, silent=true, buffer=bufnr }
-            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-            vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-            vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-            vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-            vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-            vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-            vim.keymap.set('n', '<space>wl', function()
-              print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-            end, bufopts)
-            vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-            vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-            vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-            vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-            vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
           end
           local lsp_flags = {
             debounce_text_changes = 150,
@@ -116,11 +159,11 @@
         plugin = telescope-nvim;
         config = ''
           " telescope
-          let mapleader=";"
-          nnoremap <leader>ff <cmd>Telescope find_files<cr>
-          nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-          nnoremap <leader>fb <cmd>Telescope buffers<cr>
-          nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+          " let mapleader=" "
+          " nnoremap <leader>ff <cmd>Telescope find_files<cr>
+          " nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+          " nnoremap <leader>fb <cmd>Telescope buffers<cr>
+          " nnoremap <leader>fh <cmd>Telescope help_tags<cr>
         '';
       }
       {
@@ -149,11 +192,15 @@
       {
         plugin = vim-easymotion;
         config = ''
-          nnoremap \ <Plug>(easymotion-overwin-f)
+          " Easymotion
+          let g:EasyMotion_do_mapping = 0
+          nnoremap <Leader>F <Plug>(easymotion-overwin-f2)
+          xnoremap <Leader>F <Plug>(easymotion-s2)
         '';
       }
     ];
     extraConfig = ''
+      let mapleader=" "
       set clipboard=unnamedplus
       set number
       set relativenumber
