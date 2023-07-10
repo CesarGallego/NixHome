@@ -43,7 +43,34 @@
   programs.fzf = {
     enable = true;
   };
+  programs.tmux = {
+    enable = true;
+    tmuxp.enable = true;
+    clock24 = true;
+    keyMode = "vi";
+    baseIndex = 1;
+    resizeAmount = 1;
+    extraConfig = ''
+      set-option -g bell-action none
+      set-option -g visual-bell off
+      set-option -sa terminal-overrides ",xterm*:Tc"
+      set -g mouse on
+      set -g @continuum-restore 'on'
 
+      bind '"' split-window -v -c "#{pane_current_path}"
+      bind % split-window -h -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
+    '';
+    plugins = with pkgs.tmuxPlugins; [
+      better-mouse-mode
+      sensible
+      vim-tmux-navigator
+      nord
+      yank
+      resurrect
+      continuum
+    ];
+  };
   programs.neovim = {
     enable = true;
     plugins = with pkgs.vimPlugins; [
@@ -62,6 +89,7 @@
             local keymap = {
                 f = { -- set a nested structure
                     name = '+find',
+                    a = {'<Cmd>Telescope grep_string<CR>', 'grep string'},
                     f = {'<Cmd>Telescope find_files<CR>', 'files'},
                     b = {'<Cmd>Telescope buffers<CR>', 'buffers'},
                     h = {'<Cmd>Telescope help_tags<CR>', 'help tags'},
